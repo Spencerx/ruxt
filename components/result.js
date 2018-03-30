@@ -16,7 +16,7 @@ import { style, toast } from "react-toastify";
 style({
   colorDefault: "#153B58",
   colorProgressDefault: "#db3340",
-  width: "500px",
+  width: "500px"
 });
 
 const humanCount = 1000;
@@ -26,7 +26,7 @@ const deviceList = [
   { value: "all", label: "All device types" },
   { value: "phone", label: "Phone" },
   { value: "tablet", label: "Tablet" },
-  { value: "desktop", label: "Desktop" },
+  { value: "desktop", label: "Desktop" }
 ];
 const connectionList = [
   { value: "all", label: "All connection types" },
@@ -34,7 +34,7 @@ const connectionList = [
   { value: "3G", label: "3G" },
   { value: "2G", label: "2G" },
   { value: "slow-2G", label: "slow-2G" },
-  { value: "offline", label: "offline" },
+  { value: "offline", label: "offline" }
 ];
 
 class ResultComponent extends React.Component {
@@ -51,7 +51,7 @@ class ResultComponent extends React.Component {
       fcpHumanCount: 0,
       loadingHumanCount: humanCount,
       onloadHumanCount: 0,
-      loading: false,
+      loading: false
     };
 
     this.handleOnURLChange = this.handleOnURLChange.bind(this);
@@ -61,94 +61,123 @@ class ResultComponent extends React.Component {
     this.handleOnTimeChange = this.handleOnTimeChange.bind(this);
     this.handleUpdateNumbers = this.handleUpdateNumbers.bind(this);
     this.handleUpdateHumanCount = this.handleUpdateHumanCount.bind(this);
-    this.onUrlSuggestionsFetchRequested = this.onUrlSuggestionsFetchRequested.bind(this);
-    this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(this);
+    this.onUrlSuggestionsFetchRequested = this.onUrlSuggestionsFetchRequested.bind(
+      this
+    );
+    this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(
+      this
+    );
     this.onSuggestionSelected = this.onSuggestionSelected.bind(this);
-    this.debouncedLoadSuggestions = debounce(this.loadSuggestionsFromServer, 500);
+    this.debouncedLoadSuggestions = debounce(
+      this.loadSuggestionsFromServer,
+      500
+    );
   }
 
   componentDidMount() {
-    const { device, connection, url  } = Router.query;
+    const { device, connection, url } = Router.query;
     if (url === undefined && device === undefined && connection === undefined) {
       const basicURL = window.location.pathname;
       Router.push(basicURL, basicURL, { shallow: true });
     } else {
-      const newURL = window.location.pathname + "?" +
-      qs.stringify({ url: url ? url : defaultUrl, device: device ? device : devAndconDefault,
-        connection: connection ? connection : devAndconDefault }, { encode: false });
+      const newURL =
+        window.location.pathname +
+        "?" +
+        qs.stringify(
+          {
+            url: url ? url : defaultUrl,
+            device: device ? device : devAndconDefault,
+            connection: connection ? connection : devAndconDefault
+          },
+          { encode: false }
+        );
       Router.push(newURL, newURL, { shallow: true });
       this.setState({
         url,
         device,
-        connection,
+        connection
       });
-      this.handleUpdateNumbers(
-        url,
-        device,
-        connection,
-      );
+      this.handleUpdateNumbers(url, device, connection);
     }
   }
 
   handleOnURLChange(event, { newValue }) {
     const originUrl = { newValue };
     this.setState({
-      url: originUrl.newValue,
+      url: originUrl.newValue
     });
 
     // update the url
     const { device, connection, url, time } = Router.query;
-    const newURL = window.location.pathname + "?" +
-      qs.stringify({ url: originUrl.newValue, device: device ? device : devAndconDefault,
-        connection: connection ? connection : devAndconDefault }, { encode: false });
+    const newURL =
+      window.location.pathname +
+      "?" +
+      qs.stringify(
+        {
+          url: originUrl.newValue,
+          device: device ? device : devAndconDefault,
+          connection: connection ? connection : devAndconDefault
+        },
+        { encode: false }
+      );
     Router.push(newURL, newURL, { shallow: true });
   }
 
   handleOnDeviceChange(selectedOption) {
     this.setState({
-      device: selectedOption.value,
+      device: selectedOption.value
     });
-    if ((this.state.url) || (!(this.state.url = defaultUrl))) {
+    if (this.state.url || !(this.state.url = defaultUrl)) {
       this.handleUpdateNumbers(
         this.state.url,
         selectedOption.value,
-        this.state.connection,
+        this.state.connection
       );
     }
     const { device, connection, url, time } = Router.query;
-    const newURL = window.location.pathname + "?" +
-      qs.stringify({ url, device: selectedOption.value, connection }, { encode: false });
+    const newURL =
+      window.location.pathname +
+      "?" +
+      qs.stringify(
+        { url, device: selectedOption.value, connection },
+        { encode: false }
+      );
     Router.push(newURL, newURL, { shallow: true });
   }
 
   handleOnConnectionChange(selectedOption) {
     this.setState({
-      connection: selectedOption.value,
+      connection: selectedOption.value
     });
-    if ((this.state.url) || (!(this.state.url = defaultUrl))) {
+    if (this.state.url || !(this.state.url = defaultUrl)) {
       this.handleUpdateNumbers(
         this.state.url,
         this.state.device,
-        selectedOption.value,
+        selectedOption.value
       );
     }
-    const {
-      device,
-      connection,
-      url,
-      time } = Router.query;
-    const newURL = window.location.pathname + "?" +
-      qs.stringify({ url, device, connection: selectedOption.value }, { encode: false });
+    const { device, connection, url, time } = Router.query;
+    const newURL =
+      window.location.pathname +
+      "?" +
+      qs.stringify(
+        { url, device, connection: selectedOption.value },
+        { encode: false }
+      );
     Router.push(newURL, newURL, { shallow: true });
   }
 
   handleOnTimeChange(selectedOption) {
-    if (typeof(selectedOption) === "number") {
+    if (typeof selectedOption === "number") {
       this.setState({
-        time: selectedOption,
+        time: selectedOption
       });
     }
-    this.handleUpdateHumanCount(this.state.fcp, this.state.onload, selectedOption);
+    this.handleUpdateHumanCount(
+      this.state.fcp,
+      this.state.onload,
+      selectedOption
+    );
   }
 
   handleGetOrigins(input) {
@@ -158,11 +187,11 @@ class ResultComponent extends React.Component {
     return fetch(`${process.env.BACKEND_URL}/search`, {
       method: "post",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        origin: input,
-      }),
+        origin: input
+      })
     })
       .then(response => response.json())
       .then(json => ({ options: json }));
@@ -176,31 +205,35 @@ class ResultComponent extends React.Component {
     }
 
     this.setState({
-      loading: true,
+      loading: true
     });
     const origin = url.origin || url;
     const response = await fetch(`${process.env.BACKEND_URL}/content`, {
       method: "post",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         origin,
         device,
-        connection,
-      }),
+        connection
+      })
     });
     if (response.ok) {
       const responseJSON = await response.json();
       this.setState({
         fcp: responseJSON.bam.fcp,
         onload: responseJSON.bam.onload,
-        loading: false,
+        loading: false
       });
-      this.handleUpdateHumanCount(responseJSON.bam.fcp, responseJSON.bam.onload, this.state.time);
+      this.handleUpdateHumanCount(
+        responseJSON.bam.fcp,
+        responseJSON.bam.onload,
+        this.state.time
+      );
       if (responseJSON.bam.fcp === null) {
         toast("We don't have data for that particular website", {
-          position: toast.POSITION.BOTTOM_LEFT,
+          position: toast.POSITION.BOTTOM_LEFT
         });
       }
     } else {
@@ -209,10 +242,10 @@ class ResultComponent extends React.Component {
         onloadHumanCount: 0,
         fcpHumanCount: 0,
         loadingHumanCount: humanCount,
-        loading: false,
+        loading: false
       });
       toast("We don't have data for that particular website", {
-        position: toast.POSITION.BOTTOM_LEFT,
+        position: toast.POSITION.BOTTOM_LEFT
       });
     }
   }
@@ -222,7 +255,7 @@ class ResultComponent extends React.Component {
       this.setState({
         onloadHumanCount: 0,
         fcpHumanCount: 0,
-        loadingHumanCount: humanCount,
+        loadingHumanCount: humanCount
       });
       return;
     }
@@ -234,20 +267,26 @@ class ResultComponent extends React.Component {
 
     if (onload) {
       onload_prob = onload[time];
-      onloadHumanCount = Math.max(0, Math.floor(onload_prob*humanCount));
+      onloadHumanCount = Math.max(0, Math.floor(onload_prob * humanCount));
     }
 
     if (fcp) {
       fcp_prob = fcp[time];
-      fcpHumanCount = Math.max(0, Math.floor((fcp_prob-onload_prob)*humanCount));
+      fcpHumanCount = Math.max(
+        0,
+        Math.floor((fcp_prob - onload_prob) * humanCount)
+      );
     }
 
-    const loadingHumanCount = Math.max(0, Math.floor(humanCount - fcp_prob*humanCount));
+    const loadingHumanCount = Math.max(
+      0,
+      Math.floor(humanCount - fcp_prob * humanCount)
+    );
 
     this.setState({
       onloadHumanCount,
       fcpHumanCount,
-      loadingHumanCount,
+      loadingHumanCount
     });
   }
 
@@ -255,14 +294,14 @@ class ResultComponent extends React.Component {
     this.handleUpdateNumbers(
       suggestion.origin,
       this.state.device,
-      this.state.connection,
+      this.state.connection
     );
   }
 
   async loadSuggestionsFromServer(value) {
     const urls = await this.handleGetOrigins(value);
     this.setState({
-      urlSuggestions: urls.options,
+      urlSuggestions: urls.options
     });
   }
 
@@ -272,7 +311,7 @@ class ResultComponent extends React.Component {
 
   onSuggestionsClearRequested() {
     this.setState({
-      urlSuggestions: [],
+      urlSuggestions: []
     });
   }
 
@@ -281,9 +320,7 @@ class ResultComponent extends React.Component {
   }
 
   renderUrlSuggestion(url) {
-    return (
-      <span>{url.origin}</span>
-    );
+    return <span>{url.origin}</span>;
   }
 
   render() {
@@ -293,10 +330,10 @@ class ResultComponent extends React.Component {
     const inputProps = {
       placeholder: urlPlaceholder,
       value,
-      onFocus: (ev) => {
+      onFocus: ev => {
         ev.target.select();
       },
-      onChange: this.handleOnURLChange,
+      onChange: this.handleOnURLChange
     };
 
     return (
